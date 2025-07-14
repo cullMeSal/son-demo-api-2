@@ -2,12 +2,15 @@ package demo02.demo.Entity;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import jdk.jfr.Name;
 import org.antlr.v4.runtime.misc.NotNull;
 
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(unique = true)
