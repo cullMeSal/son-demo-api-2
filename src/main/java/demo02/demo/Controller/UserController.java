@@ -3,6 +3,8 @@ package demo02.demo.Controller;
 import demo02.demo.Entity.User;
 import demo02.demo.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +22,11 @@ public class UserController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable("id") Long id){
-        User foundUser = userRepo.getById(id);
-        return ResponseEntity.ok(foundUser);
+    public ResponseEntity<?> getUser(@PathVariable("id") Long id){
+        Optional<User> foundUser = userRepo.findById(id);
+        if (foundUser.isPresent()) return ResponseEntity.ok(foundUser.get());
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+
     }
 
 }

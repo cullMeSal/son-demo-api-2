@@ -10,14 +10,16 @@ import org.antlr.v4.runtime.misc.NotNull;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Nonnull
     @Column(name = "user_id")
     private Long id;
 
-    @Column(unique = true)
     @Nonnull
+    @Column(unique = true, name = "user_name")
     private String username;
 
     @Nonnull
+    @Column(name = "user_password")
     private String password;
 
     public Long getId() {
