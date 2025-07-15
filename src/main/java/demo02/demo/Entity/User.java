@@ -2,22 +2,19 @@ package demo02.demo.Entity;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
-import jdk.jfr.Name;
-import org.antlr.v4.runtime.misc.NotNull;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", schema = "public")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "id")
     private Long id;
 
-    @Column(unique = true)
-    @Nonnull
+    @Column(name = "username",unique = true, nullable = false)
     private String username;
 
-    @Nonnull
+    @Column(name = "password", nullable = false)
     private String password;
 
     public Long getId() {
