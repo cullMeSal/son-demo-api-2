@@ -1,10 +1,14 @@
-package demo02.demo.Controller;
+package demo02.demo.controller;
 
-import demo02.demo.Entity.User;
-import demo02.demo.Repository.UserRepository;
+import demo02.demo.dto.UserAuthDTO;
+import demo02.demo.dto.UserCreationDTO;
+import demo02.demo.entity.User;
+import demo02.demo.repository.UserRepository;
+import demo02.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -13,21 +17,19 @@ import java.util.Optional;
 @RequestMapping("/api/users")
 public class UserController {
     @Autowired
-    UserRepository userRepo;
+    private UserRepository userRepo;
 
-    @GetMapping("/sayhi")
-    public ResponseEntity<String> sayhi(){
-        return ResponseEntity.ok("Henlo");
-    }
+    @Autowired
+    private UserService userService;
+
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
-        if (userRepo.findByUsername(user.getUsername()).isEmpty()) return ResponseEntity.ok(userRepo.save(user));
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Username already exist.");
+    public ResponseEntity<?> register(@RequestBody UserCreationDTO userDTO) {
+        return userService.createUser(userDTO);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user){
+    public ResponseEntity<String> login(@RequestBody UserAuthDTO user){
         Optional<User> foundUser = userRepo.findByUsername(user.getUsername());
         if (foundUser.isPresent()) {
             if (user.getPassword().equals(foundUser.get().getPassword())){

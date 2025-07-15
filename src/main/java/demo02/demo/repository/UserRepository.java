@@ -1,6 +1,6 @@
-package demo02.demo.Repository;
+package demo02.demo.repository;
 
-import demo02.demo.Entity.User;
+import demo02.demo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
