@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepo;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
 
 
     public ResponseEntity<?> registerNewUserAccount(UserCreationDTO userDTO)  {
@@ -29,7 +30,7 @@ public class UserService {
         }
         UserEntity user = new UserEntity();
         user.setUsername(userDTO.getUsername());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        user.setPassword(new BCryptPasswordEncoder(4).encode(userDTO.getPassword()));
         user.setEmail(userDTO.getEmail());
 
         return ResponseEntity.ok(userRepo.save(user));

@@ -11,6 +11,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -33,19 +34,8 @@ public class SecurityConfig {
     private JwtFilter filter;
 
     @Bean
-    protected PasswordEncoder passwordEncoder() {
-        return new  BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authManager(UserDetailsService userDetailsService,
-                                             PasswordEncoder passwordEncoder
-    ) {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
-
-        return new ProviderManager(authProvider);
+    public AuthenticationManager authManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
         @Bean
@@ -53,7 +43,7 @@ public class SecurityConfig {
         System.out.println("DaoAuth: KKKK");
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(new BCryptPasswordEncoder(4));
         return authProvider;
     }
 
@@ -66,11 +56,10 @@ public class SecurityConfig {
                     .requestMatchers( "/api/users/register", "/api/users/login", "/api/users/loginold").permitAll()
                     .anyRequest().authenticated()
                 )
+                .httpBasic(Customizer.withDefaults())
 //                .formLogin(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-
-
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +33,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtUserDetailsService userDetailsService;
@@ -78,7 +79,7 @@ public class UserController {
         Optional<UserEntity> foundUser = userRepo.findByUsername(user.getUsername());
         if (foundUser.isPresent()) {
             // use password encoder to compare raw user entered password with encoded password
-            if (passwordEncoder.matches(user.getPassword(),foundUser.get().getPassword())){
+            if (new BCryptPasswordEncoder(4).matches(user.getPassword(),foundUser.get().getPassword())){
             return ResponseEntity.ok("Login successfully");
         }}
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong credentials");
