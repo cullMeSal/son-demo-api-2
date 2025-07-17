@@ -25,7 +25,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         if (foundUser.isPresent()){
             return new User(
                     foundUser.get().getUsername(),
-                    new BCryptPasswordEncoder().encode(foundUser.get().getPassword()),
+                    foundUser.get().getPassword(),
                     new ArrayList<>()
             );
         } else {
