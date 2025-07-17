@@ -25,15 +25,15 @@ public class UserService {
 
 
     public ResponseEntity<?> registerNewUserAccount(UserCreationDTO userDTO)  {
-        if (usernameExist(userDTO)) {
-            ResponseEntity.status(HttpStatus.FORBIDDEN).body("Username already exist.");
-        }
-        UserEntity user = new UserEntity();
-        user.setUsername(userDTO.getUsername());
-        user.setPassword(new BCryptPasswordEncoder(4).encode(userDTO.getPassword()));
-        user.setEmail(userDTO.getEmail());
+        if (userRepo.findByUsername(userDTO.getUsername()).isEmpty()
+                && userDTO.getEmail().matches("^[\\w_+-.]+@[\\w_+-.]+\\.[a-zA-Z]{2,}$")) {
+            UserEntity user = new UserEntity();
+            user.setUsername(userDTO.getUsername());
+            user.setPassword(new BCryptPasswordEncoder(4).encode(userDTO.getPassword()));
+            user.setEmail(userDTO.getEmail());
 
-        return ResponseEntity.ok(userRepo.save(user));
+            return ResponseEntity.ok(userRepo.save(user));
+        } else return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Username already exist or invalid email format.");
     }
 
     // consider replacing this method
@@ -50,11 +50,6 @@ public class UserService {
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Username already exist.");
     }
-
-    public boolean usernameExist(UserCreationDTO userDTO) {
-        return userRepo.findByUsername(userDTO.getUsername()).isPresent();
-    }
-
 
 
 }
