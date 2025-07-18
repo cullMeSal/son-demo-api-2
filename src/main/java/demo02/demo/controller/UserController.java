@@ -36,14 +36,8 @@ public class UserController {
 //    @Autowired
 //    private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtUserDetailsService userDetailsService;
 
-    @Autowired
-    private TokenManager tokenManager;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     @GetMapping("/sayhi")
     public ResponseEntity<String> sayhi(){
@@ -56,24 +50,13 @@ public class UserController {
         return userService.registerNewUserAccount(userDTO);
     }
 
-    // Try to make sense of this mapping here.
     @PostMapping("/login")
     public ResponseEntity<JwtResponseModel> createToken(@RequestBody JwtRequestModel request) throws Exception{
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-            System.out.println("Login: LLLLLL");
-        } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e){
-            throw new Exception("INVALID_CREDENTIALS", e);
-        }
-        final UserDetails userDetails = userDetailsService
-                .loadUserByUsername(request.getUsername());
-        final String jwtToken = tokenManager.generateJwtToken(userDetails);
-        return ResponseEntity.ok(new JwtResponseModel(jwtToken));
+        return userService.authenticateLogin(request);
 
     }
 
+    // Old login mapping that'll not encrypt password on register. Awaiting removal
     @PostMapping("/loginold")
     public ResponseEntity<String> login(@RequestBody UserAuthDTO user){
         Optional<UserEntity> foundUser = userRepo.findByUsername(user.getUsername());
@@ -86,7 +69,7 @@ public class UserController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<?> getUser(@PathVariable("id") Long id){
+    public ResponseEntity<?> getUser(@PathVariable("id") Long id ){
         Optional<UserEntity> foundUser = userRepo.findById(id);
         if (foundUser.isPresent()) return ResponseEntity.ok(foundUser.get());
         else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
