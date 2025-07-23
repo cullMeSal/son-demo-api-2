@@ -25,8 +25,8 @@ public class TokenManager {
     @Value("${secret}")
     private String jwtSecret; // get value from application.property
 
-    // generate Jwt token from userDetails (which will be put in the payload and
-    // be combined with header and signature)
+    // generate Jwt token containing username from userDetails, stored in payload
+    // combining with header and signature hashed using HS256 algo
     public String generateJwtToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
         return Jwts

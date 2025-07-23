@@ -43,6 +43,8 @@ public class JwtFilter extends OncePerRequestFilter { // So this filter goes off
         String username = null;
         String token = null;
 
+
+        // Check token
         if (tokenHeader != null && tokenHeader.startsWith("Bearer ")){
             token = tokenHeader.substring(7);
             try {
@@ -68,10 +70,11 @@ public class JwtFilter extends OncePerRequestFilter { // So this filter goes off
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
+        // If request trying to get user info using userId, authorize only those with matching userId
         if (path.matches("/api/users/[0-9]+")){
-            Long userId = Long.parseLong(path.substring(path.lastIndexOf("/")+1));
+            Long userId = Long.parseLong(path.substring(path.lastIndexOf("/")+1)); // get requested userId
             System.out.println("User ID: "+ userId);
-            Long tokenId = userRepo.findByUsername(tokenManager.getUsernameFromToken(token)).get().getId();
+            Long tokenId = userRepo.findByUsername(tokenManager.getUsernameFromToken(token)).get().getId(); // get requesting userId from token
             System.out.println("User ID in token: "+tokenId);
 
             if (userId.compareTo(tokenId) != 0){
