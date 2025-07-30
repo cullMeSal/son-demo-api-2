@@ -20,7 +20,7 @@ import java.util.Map;
 @Component
 public class TokenManager {
     private static final long serialVersionUID = 123456L;
-    public static final long TOKEN_VALIDITY = 10*60; // 10 minutes
+    public static final long TOKEN_VALIDITY = 60*60; // 60 minutes
 
     @Value("${secret}")
     private String jwtSecret; // get value from application.property
@@ -32,7 +32,8 @@ public class TokenManager {
         return Jwts
                 .builder()
                 .setClaims(claims) // reset claims to an empty hashmap
-                .setSubject(userDetails.getUsername()) // manually set each claim
+                .setSubject(userDetails.getUsername())
+//                .claim("role", userDetails.getAuthorities().toArray())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000))
                 .signWith(getKey(), SignatureAlgorithm.HS256) // specify the algorithm to sign the jwt using specific key

@@ -30,15 +30,15 @@ public class JwtFilter extends OncePerRequestFilter { // So this filter goes off
     {
         String path = request.getServletPath();
 
-        // Skip JWT check for login and register urls
-        if (path.equals("/api/users/login") || path.equals("/api/users/register")) {
-            System.out.println("skipping");
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        // Skip JWT check for login and register urls
+//        if (path.equals("/api/users/login") || path.equals("/api/users/register")) {
+//            System.out.println("skipping");
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
 
-        // Raise an exception when token is not found
+        // Log when token is not found
         String tokenHeader = request.getHeader("Authorization");
         String username = null;
         String token = null;
@@ -70,19 +70,19 @@ public class JwtFilter extends OncePerRequestFilter { // So this filter goes off
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
         }
-        // If request trying to get user info using userId, authorize only those with matching userId
-        if (path.matches("/api/users/[0-9]+")){
-            Long userId = Long.parseLong(path.substring(path.lastIndexOf("/")+1)); // get requested userId
-            System.out.println("User ID: "+ userId);
-            Long tokenId = userRepo.findByUsername(tokenManager.getUsernameFromToken(token)).get().getId(); // get requesting userId from token
-            System.out.println("User ID in token: "+tokenId);
-
-            if (userId.compareTo(tokenId) != 0){
-                System.out.println("You are not authorized to access this information");
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
-                return;
-            }
-        }
+//        // If request trying to get user info using userId, authorize only those with matching userId
+//        if (path.matches("/api/users/[0-9]+")){
+//            Long userId = Long.parseLong(path.substring(path.lastIndexOf("/")+1)); // get requested userId
+//            System.out.println("User ID: "+ userId);
+//            Long tokenId = userRepo.findByUsername(tokenManager.getUsernameFromToken(token)).get().getId(); // get requesting userId from token
+//            System.out.println("User ID in token: "+tokenId);
+//
+//            if (userId.compareTo(tokenId) != 0){
+//                System.out.println("You are not authorized to access this information");
+//                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
+//                return;
+//            }
+//        }
         filterChain.doFilter(request, response);
     }
 }

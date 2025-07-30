@@ -2,8 +2,9 @@ package demo02.demo.controller;
 
 import demo02.demo.dto.UserAuthDTO;
 import demo02.demo.dto.UserCreationDTO;
+import demo02.demo.dto.UserQueryRequestModel;
+import demo02.demo.dto.UserQueryResultDTO;
 import demo02.demo.entity.UserEntity;
-import demo02.demo.exception.UsernameExistException;
 import demo02.demo.jwtutils.models.JwtRequestModel;
 import demo02.demo.jwtutils.models.JwtResponseModel;
 import demo02.demo.repository.UserRepository;
@@ -11,9 +12,11 @@ import demo02.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -29,8 +32,6 @@ public class UserController {
 //    private PasswordEncoder passwordEncoder;
 
 
-
-
     @GetMapping("/sayhi")
     public ResponseEntity<String> sayhi(){
         System.out.println("helo");
@@ -38,7 +39,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserCreationDTO userDTO) throws UsernameExistException {
+    public ResponseEntity<?> register(@RequestBody UserCreationDTO userDTO)  {
         return userService.registerNewUserAccount(userDTO);
     }
 
@@ -60,11 +61,21 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong credentials");
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity<?> getUser(@PathVariable("id") Long id ){
-        Optional<UserEntity> foundUser = userRepo.findById(id);
-        if (foundUser.isPresent()) return ResponseEntity.ok(foundUser.get());
-        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    @PostMapping("/query")
+    public ResponseEntity<?> queryUser(
+            @RequestBody UserQueryRequestModel request,
+            @RequestParam(name = "limit", required = false) Integer limit,
+            @RequestParam(name = "page", required = false) Integer page
+    )
+    {
+        List<UserQueryResultDTO> userList = userService.userQuery(limit, page ,request.getUsername(), request.getEmail());
+        return ResponseEntity.ok(userList);
     }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<?> getUser(@PathVariable("id") Long id, Authentication authentication){
+        return userService.getUserInfo(id, authentication);
+    }
+
 
 }
